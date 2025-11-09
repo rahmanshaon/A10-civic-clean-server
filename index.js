@@ -10,6 +10,7 @@ const port = process.env.PORT || 3000;
 // --- Middlewares ---
 app.use(cors());
 app.use(express.json());
+const verifyToken = require("./middleware/verifyToken");
 
 // --- MongoDB Connection ---
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pc7o2g1.mongodb.net/?appName=Cluster0`;
@@ -57,21 +58,28 @@ async function run() {
     });
 
     // POST a new issue to the database
-    app.post("/issues", async (req, res) => {
+    app.post("/issues", verifyToken, async (req, res) => {
       const newIssue = req.body;
-      console.log("Received new issue to save:", newIssue);
+      console.log("Saving new issue for user:", req.user.email);
       const result = await issuesCollection.insertOne(newIssue);
       res.send(result);
     });
 
     // GET issues filtered by user email
-    app.get("/my-issues", async (req, res) => {
+    app.get("/my-issues", verifyToken, async (req, res) => {
+      if (req.user.email !== req.query.email) {
+        return res
+          .status(403)
+          .send({ message: "Forbidden: You can only access your own issues." });
+      }
+
       const email = req.query.email;
       if (!email) {
         return res
           .status(400)
           .send({ message: "Email query parameter is required" });
       }
+
       const query = { email: email };
       const cursor = issuesCollection.find(query);
       const result = await cursor.toArray();
@@ -79,13 +87,20 @@ async function run() {
     });
 
     // GET contributions filtered by user email
-    app.get("/my-contributions", async (req, res) => {
+    app.get("/my-contributions", verifyToken, async (req, res) => {
+      if (req.user.email !== req.query.email) {
+        return res.status(403).send({
+          message: "Forbidden: You can only access your own contributions.",
+        });
+      }
+
       const email = req.query.email;
       if (!email) {
         return res
           .status(400)
           .send({ message: "Email query parameter is required" });
       }
+
       const query = { email: email };
       const cursor = contributionsCollection.find(query);
       const result = await cursor.toArray();
@@ -93,9 +108,9 @@ async function run() {
     });
 
     // POST a new contribution
-    app.post("/contributions", async (req, res) => {
+    app.post("/contributions", verifyToken, async (req, res) => {
       const newContribution = req.body;
-      console.log("Saving new contribution:", newContribution);
+      console.log("Saving new contribution for user:", req.user.email);
       const result = await contributionsCollection.insertOne(newContribution);
       res.send(result);
     });
