@@ -115,6 +115,14 @@ async function run() {
       res.send(result);
     });
 
+    // GET contributions for a specific issue ID
+    app.get("/contributions/:issueId", async (req, res) => {
+      const issueId = req.params.issueId;
+      const query = { issueId: issueId };
+      const contributions = await contributionsCollection.find(query).toArray();
+      res.send(contributions);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
