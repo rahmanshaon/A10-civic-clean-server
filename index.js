@@ -78,6 +78,20 @@ async function run() {
       res.send(result);
     });
 
+    // GET contributions filtered by user email
+    app.get("/my-contributions", async (req, res) => {
+      const email = req.query.email;
+      if (!email) {
+        return res
+          .status(400)
+          .send({ message: "Email query parameter is required" });
+      }
+      const query = { email: email };
+      const cursor = contributionsCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
