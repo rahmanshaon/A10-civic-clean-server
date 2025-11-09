@@ -27,7 +27,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server
-    await client.connect();
+    // await client.connect();
 
     const database = client.db("civicCleanDB");
     const issuesCollection = database.collection("issues");
@@ -67,8 +67,6 @@ async function run() {
         ...newIssueFromClient,
         date: new Date(),
       };
-
-      console.log("Saving new issue for user:", req.user.email);
 
       const result = await issuesCollection.insertOne(issueToInsert);
       res.send(result);
@@ -156,7 +154,6 @@ async function run() {
         date: new Date(),
       };
 
-      console.log("Saving new contribution for user:", req.user.email);
       const result = await contributionsCollection.insertOne(
         contributionToInsert
       );
@@ -172,10 +169,10 @@ async function run() {
     });
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     // await client.close();
   }
