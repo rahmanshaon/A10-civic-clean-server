@@ -41,6 +41,13 @@ async function run() {
       res.send(result);
     });
 
+    // GET latest 6 issues for the home page
+    app.get("/issues/recent", async (req, res) => {
+      const cursor = issuesCollection.find().sort({ _id: -1 }).limit(6);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
