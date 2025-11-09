@@ -92,6 +92,14 @@ async function run() {
       res.send(result);
     });
 
+    // POST a new contribution
+    app.post("/contributions", async (req, res) => {
+      const newContribution = req.body;
+      console.log("Saving new contribution:", newContribution);
+      const result = await contributionsCollection.insertOne(newContribution);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
