@@ -56,6 +56,14 @@ async function run() {
       res.send(result);
     });
 
+    // POST a new issue to the database
+    app.post("/issues", async (req, res) => {
+      const newIssue = req.body;
+      console.log("Received new issue to save:", newIssue);
+      const result = await issuesCollection.insertOne(newIssue);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
