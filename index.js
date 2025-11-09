@@ -28,6 +28,19 @@ async function run() {
     // Connect the client to the server
     await client.connect();
 
+    const database = client.db("civicCleanDB");
+    const issuesCollection = database.collection("issues");
+    const contributionsCollection = database.collection("contributions");
+
+    // --- API Endpoints ---
+
+    // GET all issues
+    app.get("/issues", async (req, res) => {
+      const cursor = issuesCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
