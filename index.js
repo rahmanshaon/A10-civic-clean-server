@@ -44,7 +44,9 @@ async function run() {
 
     // GET latest 6 issues for the home page
     app.get("/issues/recent", async (req, res) => {
-      const cursor = issuesCollection.find().sort({ _id: -1 }).limit(6);
+      const query = { status: "ongoing" };
+
+      const cursor = issuesCollection.find(query).sort({ date: -1 }).limit(6);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -59,9 +61,47 @@ async function run() {
 
     // POST a new issue to the database
     app.post("/issues", verifyToken, async (req, res) => {
-      const newIssue = req.body;
+      const newIssueFromClient = req.body;
+
+      const issueToInsert = {
+        ...newIssueFromClient,
+        date: new Date(),
+      };
+
       console.log("Saving new issue for user:", req.user.email);
-      const result = await issuesCollection.insertOne(newIssue);
+
+      const result = await issuesCollection.insertOne(issueToInsert);
+      res.send(result);
+    });
+
+    // PUT endpoint to update an issue
+    app.put("/issues/:id", verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const updatedIssueData = req.body;
+      const filter = { _id: new ObjectId(id) };
+
+      const updateDoc = {
+        $set: {
+          title: updatedIssueData.title,
+          category: updatedIssueData.category,
+          description: updatedIssueData.description,
+          amount: updatedIssueData.amount,
+          status: updatedIssueData.status,
+          location: updatedIssueData.location,
+          image: updatedIssueData.image,
+          date: new Date(),
+        },
+      };
+
+      const result = await issuesCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    // DELETE endpoint to remove an issue
+    app.delete("/issues/:id", verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await issuesCollection.deleteOne(query);
       res.send(result);
     });
 
@@ -102,16 +142,24 @@ async function run() {
       }
 
       const query = { email: email };
-      const cursor = contributionsCollection.find(query);
+      const cursor = contributionsCollection.find(query).sort({ date: -1 });
       const result = await cursor.toArray();
       res.send(result);
     });
 
     // POST a new contribution
     app.post("/contributions", verifyToken, async (req, res) => {
-      const newContribution = req.body;
+      const newContributionFromClient = req.body;
+
+      const contributionToInsert = {
+        ...newContributionFromClient,
+        date: new Date(),
+      };
+
       console.log("Saving new contribution for user:", req.user.email);
-      const result = await contributionsCollection.insertOne(newContribution);
+      const result = await contributionsCollection.insertOne(
+        contributionToInsert
+      );
       res.send(result);
     });
 
