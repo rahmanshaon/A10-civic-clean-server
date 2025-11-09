@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 // Initialize the Express app
@@ -45,6 +45,14 @@ async function run() {
     app.get("/issues/recent", async (req, res) => {
       const cursor = issuesCollection.find().sort({ _id: -1 }).limit(6);
       const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // GET a single issue by its ID
+    app.get("/issues/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await issuesCollection.findOne(query);
       res.send(result);
     });
 
