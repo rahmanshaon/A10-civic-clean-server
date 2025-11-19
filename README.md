@@ -2,11 +2,11 @@
 
 The server-side REST API for the CivicClean platform. Handles secure data operations, user verification, and communication with MongoDB database.
 
-**🔗 Live API:** [Deployed on Vercel](https://civic-clean-server.vercel.app/)
+**Live API:** [Deployed on Vercel](https://civic-clean-server.vercel.app/)
 
 ---
 
-## ✨ Main Features
+## Main Features
 
 ### Security & Authentication
 
@@ -29,7 +29,7 @@ The server-side REST API for the CivicClean platform. Handles secure data operat
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Node.js** - Server runtime environment
 - **Express.js** - RESTful API framework
